@@ -1,0 +1,15 @@
+** REM Train on MovieLens movies + top 5000 Last.fm tracks (recommended fast demo setup)
+python cli.py train --max_cross_songs 5000 --max_text_features 2500 --n_components 32 --alpha 0.25
+
+** REM Counterfactual + explainability
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --prefer era=2010s --avoid genre=Unknown --boost_term love --explain
+
+** REM ANN vs exact retrieval
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --ann_search_k 512 --ann_radius 2
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --no_ann
+
+** REM Arc playlist
+python cli.py arc --movie "Toy Story" --stages 3 --per_stage 3 --max_cross_songs 5000
+
+**REM Evaluate with hackathon metrics
+python cli.py evaluate --max_cross_songs 5000 --max_text_features 2500 --n_components 32 --alpha 0.25

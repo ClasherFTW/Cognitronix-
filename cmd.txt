@@ -1,0 +1,54 @@
+REM ============================================================
+REM - Auto bridge mode (MovieLens + Last.fm folders inside data/)
+REM - Direct movies.csv + songs.csv pair mode
+REM ============================================================
+
+REM ============================================================
+REM 1) MOVIELENS + LAST.FM (AUTO BRIDGE MODE)
+REM ============================================================
+
+** REM Train on MovieLens movies + top 5000 Last.fm tracks (recommended fast demo setup)
+python cli.py train --max_cross_songs 5000 --max_text_features 2500 --n_components 32 --alpha 0.25
+
+
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000
+
+** REM Counterfactual + explainability
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --prefer era=2010s --avoid genre=Unknown --boost_term love --explain
+
+** REM ANN vs exact retrieval
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --ann_search_k 512 --ann_radius 2
+python cli.py recommend --movie "Toy Story" --top 5 --max_cross_songs 5000 --no_ann
+
+** REM Arc playlist
+python cli.py arc --movie "Toy Story" --stages 3 --per_stage 3 --max_cross_songs 5000
+
+**REM Evaluate with hackathon metrics
+python cli.py evaluate --max_cross_songs 5000 --max_text_features 2500 --n_components 32 --alpha 0.25
+
+
+REM ============================================================
+REM 2) HEAVIER TRAINING (BETTER COVERAGE, SLOWER)
+REM ============================================================
+python cli.py train --max_cross_songs 15000 --max_text_features 3000 --n_components 40 --alpha 0.25
+python cli.py evaluate --max_cross_songs 15000 --max_text_features 3000 --n_components 40 --alpha 0.25
+
+
+REM ============================================================
+REM 3) DIRECT CUSTOM CSV MODE (IF JUDGES GIVE A CUSTOM PAIR)
+REM Put both files in the same folder and pass names explicitly.
+REM ============================================================
+python cli.py train --data_dir "C:\path\to\judge_data" --movies_file "movies.csv" --songs_file "songs.csv" --max_text_features 3000 --n_components 32 --alpha 0.25
+python cli.py recommend --data_dir "C:\path\to\judge_data" --movies_file "movies.csv" --songs_file "songs.csv" --movie "YOUR_MOVIE_TITLE" --top 5 --explain
+python cli.py arc --data_dir "C:\path\to\judge_data" --movies_file "movies.csv" --songs_file "songs.csv" --movie "YOUR_MOVIE_TITLE" --stages 3 --per_stage 3
+python cli.py evaluate --data_dir "C:\path\to\judge_data" --movies_file "movies.csv" --songs_file "songs.csv" --n_components 32 --alpha 0.25
+
+
+REM ============================================================
+REM 4) OPTIONAL: SEPARATE MODEL ARTIFACT DIRECTORIES
+REM Helps keep experiments isolated.
+REM ============================================================
+python cli.py train --max_cross_songs 5000 --model_dir ".\models\ml_lfm_5k"
+python cli.py recommend --movie "Toy Story" --max_cross_songs 5000 --model_dir ".\models\ml_lfm_5k"
+python cli.py arc --movie "Toy Story" --max_cross_songs 5000 --model_dir ".\models\ml_lfm_5k"
+python cli.py evaluate --max_cross_songs 5000 --model_dir ".\models\ml_lfm_5k"
